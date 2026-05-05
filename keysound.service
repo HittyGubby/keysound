@@ -1,0 +1,13 @@
+[Unit]
+Description=Keysound Daemon - Wayland compatible mechanical keyboard sound daemon
+After=graphical-session.target
+
+[Service]
+ExecStart=/usr/bin/keysound
+Restart=always
+RestartSec=2
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

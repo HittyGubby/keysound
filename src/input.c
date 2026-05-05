@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <poll.h>
-
+#include "input.h"
 #define MAX_DEVICES 32
 
 struct device {
@@ -108,7 +108,7 @@ void input_start(void (*callback)(int)){
 
     scan_existing_devices();
 
-    while("67"){ // :)
+    while(keep_running){ // gracefully exit on signal
         struct pollfd pfds[MAX_DEVICES+1];
 
         pfds[0].fd=udev_fd;

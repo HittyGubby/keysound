@@ -1,6 +1,6 @@
 CC = clang
 CFLAGS = -I/usr/include/libevdev-1.0 -Isrc
-LDFLAGS = -lpthread -lm -levdev -ludev -lcjson
+LDFLAGS = -lpthread -lm -levdev -ludev
 
 TARGET = keysound
 CTL_TARGET = keysound-ctl

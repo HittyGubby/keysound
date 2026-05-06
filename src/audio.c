@@ -6,7 +6,8 @@
 #include <miniaudio/miniaudio.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <cjson/cJSON.h>
+#include <dirent.h>
+#include <string.h>
 
 #define MAX_SOUNDS_PER_GROUP 4
 
@@ -49,73 +50,39 @@ static void add_sound(KeyGroup group, const char *filepath){
     printf("\nAudio at %s loaded successfully to group %s\n",filepath,group_name);
 }
 
-void load_audio_from_json(const char *config_path , const char *base_path){
-    FILE *f = fopen(config_path,"r");
-
-    if(!f){
-        printf("unable to open the config file");
-        return;
-    }
-
-    fseek(f,0,SEEK_END);
-    long size = ftell(f);
-    rewind(f);
-
-    char *data = malloc(size+1);
-    data[size] = '\0';
-    fread(data,1,size, f);
-    fclose(f);
-
-    cJSON *json = cJSON_Parse(data);
-    
-    if(!json){
-        printf("it is not json file, maybe corrupted ?");
-        free(data);
-        return;
-    }
-
-    cJSON *group = NULL;
-    cJSON_ArrayForEach(group, json){
-        KeyGroup g = group_from_string(group->string);
-
-        if(!cJSON_IsArray(group)){
-            continue;
-        }
-
-        int count = cJSON_GetArraySize(group);
-
-        for (int i = 0; i < count; i++){
-            cJSON *item = cJSON_GetArrayItem(group, i);
-
-            if(!cJSON_IsString(item)){
-                continue;
-            }
-
-            char fullpath[512];
-            snprintf(fullpath, sizeof(fullpath),"%s/%s", base_path, item->valuestring);
+void load_audio_from_directory(const char *base_path){
+    for (int i = 0; i < GROUP_COUNT; i++) {
+        KeyGroup g = (KeyGroup)i;
+        const char *group_name = group_to_string(g);
+        
+        char group_path[512];
+        snprintf(group_path, sizeof(group_path), "%s/%s", base_path, group_name);
+        
+        DIR *dir = opendir(group_path);
+        if (!dir) continue;
+        
+        struct dirent *entry;
+        while ((entry = readdir(dir)) != NULL) {
+            if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) continue;
+            
+            char fullpath[1024];
+            snprintf(fullpath, sizeof(fullpath), "%s/%s", group_path, entry->d_name);
             add_sound(g, fullpath);
         }
+        closedir(dir);
     }
-
-    cJSON_Delete(json);
-    free(data);
 }
 
 void audio_load_pack(const char *pack){
 
-    char config_path[512];
     char base_path[512];
-
-    snprintf(config_path, sizeof(config_path),
-             "%s/.config/keysound/%s/config.json",
-             getenv("HOME"), pack);
 
     snprintf(base_path, sizeof(base_path),
              "%s/.config/keysound/%s/sounds",
              getenv("HOME"), pack);
 
-    printf("\n%s <- config path and %s <- base path\n",config_path,base_path);
-    load_audio_from_json(config_path, base_path);
+    printf("\n%s <- base path\n", base_path);
+    load_audio_from_directory(base_path);
 }
 
 

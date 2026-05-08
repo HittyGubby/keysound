@@ -74,3 +74,8 @@ Simply drop your `.wav` or `.mp3` files into the corresponding folders. The daem
 Contributions are more than welcome!
 If you have any ideas on how to make this project better, just raise an issue and discuss it there.
 Your feedback, suggestions, and improvements are appreciated!
+
+## Potential Features
+
+- macOS support?
+- Volume control to `keysound-ctl`

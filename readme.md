@@ -55,6 +55,26 @@ Use the included control tool to list and switch between soundpacks even if the 
 keysound-ctl
 ```
 
+### Repeat Key Sounds
+By default, the daemon only plays a sound on the initial key press. To also play sounds when a key is held down and auto-repeats, pass the `--repeat` (or `-r`) flag:
+```bash
+keysound --repeat
+```
+
+To enable this permanently in the systemd service, override the service:
+```bash
+systemctl --user edit keysound.service
+```
+Then add `--repeat` to the `ExecStart` line:
+```ini
+ExecStart=/usr/bin/keysound --repeat
+```
+Reload systemd and restart:
+```bash
+systemctl --user daemon-reload
+systemctl --user restart keysound.service
+```
+
 ### Creating Your Own Soundpack
 Soundpacks are stored in `~/.config/keysound/` or `/usr/share/keysound/soundpacks/`.
 Each pack should have the following folder structure:

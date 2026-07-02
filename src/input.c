@@ -98,7 +98,7 @@ static void scan_existing_devices(){
     udev_unref(udev);
 }
 
-void input_start(void (*callback)(int)){
+void input_start(void (*callback)(int), int repeat_mode){
     struct udev *udev = udev_new();
 
     struct udev_monitor *mon = udev_monitor_new_from_netlink(udev, "udev");
@@ -152,9 +152,9 @@ void input_start(void (*callback)(int)){
 
                 while(libevdev_next_event(devices[i].evdev,LIBEVDEV_READ_FLAG_NORMAL, &ev) == 0){
 
-                    if(ev.type == EV_KEY && ev.value == 1){
+                    if(ev.type == EV_KEY && (ev.value == 1 || (repeat_mode && ev.value == 2))){
                         //this print statement is just for testing, later i'll add logs
-                        LOG_DEBUG("key pressed: %d %s", ev.code, libevdev_event_code_get_name(EV_KEY, ev.code));
+                        LOG_DEBUG("key %s: %d %s", ev.value == 2 ? "repeat" : "pressed", ev.code, libevdev_event_code_get_name(EV_KEY, ev.code));
                         callback(ev.code);
                     }
                 }

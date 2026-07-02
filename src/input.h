@@ -3,4 +3,4 @@
 
 extern volatile sig_atomic_t keep_running;
 
-void input_start(void (*callback)(int));
+void input_start(void (*callback)(int), int repeat_mode);

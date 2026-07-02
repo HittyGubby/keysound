@@ -117,6 +117,18 @@ int main(int argc, char *argv[]){
     sigaction(SIGINT, &sa, NULL);
     sigaction(SIGTERM, &sa, NULL);
 
+    // Parse command-line arguments
+    int repeat_mode = 0;
+    for (int i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "--repeat") == 0 || strcmp(argv[i], "-r") == 0) {
+            repeat_mode = 1;
+        }
+    }
+
+    if (repeat_mode) {
+        LOG_INFO("Repeat key sounds enabled");
+    }
+
     LOG_INFO("Starting keysound daemon...");
     ensure_default_pack();
 
@@ -125,7 +137,7 @@ int main(int argc, char *argv[]){
     audio_load_pack("current");
 
     LOG_INFO("Listening for keyboard events...");
-    input_start(on_key_pressed);
+    input_start(on_key_pressed, repeat_mode);
 
     LOG_INFO("Shutting down keysound daemon...");
     audio_cleanup();
